@@ -7,6 +7,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
@@ -28,12 +30,16 @@ import io.reactivex.functions.Consumer;
  * mail : tonydeng@hxy.com
  * 2018/11/15
  */
-public class VideoActivity extends BaseActivity implements TextureView.SurfaceTextureListener, View.OnClickListener{
+public class VideoActivity extends BaseActivity implements TextureView.SurfaceTextureListener, View.OnClickListener,
+        SurfaceHolder.Callback{
     private static String TAG = "VideoActivity";
     private TextureView mTextureView;
+    private SurfaceView mSurfaceView;
     private Camera2Record mCamera;
     private Button mBtnRecord, mBtnStop;
     private File mVideoFilePath;
+
+    private SurfaceHolder mSurfaceHolder;
     @Override
     public int getLayout() {
         return R.layout.activity_video;
@@ -78,12 +84,19 @@ public class VideoActivity extends BaseActivity implements TextureView.SurfaceTe
         mBtnRecord.setOnClickListener(this);
         mTextureView = findViewById(R.id.textureview);
         mTextureView.setSurfaceTextureListener(this);
-        mCamera = new Camera2Record(this, mTextureView);
+       // mCamera = new Camera2Record(this, mTextureView);
+
+        mSurfaceView = findViewById(R.id.surfaceview);
+        mSurfaceHolder = mSurfaceView.getHolder();
+        mSurfaceHolder.setKeepScreenOn(true);
 
     }
 
     private void initCamera(){
-        mCamera.openCamera2(ScreenUtil.getScreenWidth(this), ScreenUtil.getScreenHeight(this) - ScreenUtil.dip2px(this, 200));
+       // mCamera.openCamera2(ScreenUtil.getScreenWidth(this), ScreenUtil.getScreenHeight(this) - ScreenUtil.dip2px(this, 200));
+        mSurfaceHolder.addCallback(this);
+        mCamera = new Camera2Record(this, mSurfaceHolder, Camera2Record.TYPE_SURFACEVIEW);
+
     }
 
     private void initDir(){
@@ -142,5 +155,22 @@ public class VideoActivity extends BaseActivity implements TextureView.SurfaceTe
                 mCamera.startRecordVideo(mVideoFilePath.getAbsolutePath());
                 break;
         }
+    }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder surfaceHolder) {
+        Log.d(TAG, "surfaceCreated");
+        mCamera.openCamera2(ScreenUtil.getScreenWidth(this), ScreenUtil.getScreenHeight(this) - ScreenUtil.dip2px(this, 200));
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+        Log.d(TAG, "surfaceDestroyed");
+        mCamera.closeCamera();
     }
 }

@@ -17,10 +17,12 @@ import android.media.ImageReader;
 import android.media.MediaRecorder;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.print.PrinterId;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
+import android.view.SurfaceHolder;
 import android.view.TextureView;
 import android.widget.TextView;
 
@@ -38,6 +40,10 @@ import java.util.List;
  * 2018/11/14
  */
 public class Camera2Record {
+
+    public static final int TYPE_TEXTURE = 1;
+    public static final int TYPE_SURFACEVIEW = 2;
+
     private static String TAG = "Camera2Record";
     /**
      * The {@link android.util.Size} of camera preview.
@@ -85,11 +91,22 @@ public class Camera2Record {
 
     private CaptureRequest.Builder mPreviewBuilder;
 
+    private SurfaceHolder mSurfaceHolder;
 
-    public Camera2Record(Context mContext, TextureView mTextureView) {
+    private int type;
+
+    public Camera2Record(Context mContext, TextureView mTextureView, int type) {
         this.mContext = mContext;
         this.mTextureView = mTextureView;
+        this.type = type;
     }
+
+    public Camera2Record(Context mContext, SurfaceHolder mSurfaceHolder, int type) {
+        this.mContext = mContext;
+        this.mSurfaceHolder = mSurfaceHolder;
+        this.type = type;
+    }
+
 
     public void openCamera2(int width, int height) {
         CameraManager cameraManager = (CameraManager) mContext.getSystemService(Context.CAMERA_SERVICE);
@@ -143,27 +160,33 @@ public class Camera2Record {
         closePreviewSession();
         try {
             setUpMediaRecorder(videoFilePath);
-            SurfaceTexture texture = mTextureView.getSurfaceTexture();
-            if (texture == null) {
-                return;
-            }
-            texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+
             mPreviewBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
 
             List<Surface> surfaces = new ArrayList<>();
             // Set up Surface for the camera preview
-            Surface previewSurface = new Surface(texture);
-            surfaces.add(previewSurface);
+            Surface previewSurface = null;
 
-           //  ImageReader imageReader = ImageReader.newInstance(mVideoSize.getWidth(), mVideoSize.getHeight(), ImageFormat.JPEG, 10);
-          //  imageReader.setOnImageAvailableListener(mOnImageAvailableListener, null);
-          //  mPreviewBuilder.addTarget(imageReader.getSurface());
+            if (type == TYPE_TEXTURE) {
+                SurfaceTexture texture = mTextureView.getSurfaceTexture();
+                if (texture == null) {
+                    return;
+                }
+                texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+                previewSurface = new Surface(texture);
+            }else {
+                previewSurface = mSurfaceHolder.getSurface();
+            }
+
+            surfaces.add(previewSurface);
+            //  ImageReader imageReader = ImageReader.newInstance(mVideoSize.getWidth(), mVideoSize.getHeight(), ImageFormat.JPEG, 10);
+            //  imageReader.setOnImageAvailableListener(mOnImageAvailableListener, null);
+            //  mPreviewBuilder.addTarget(imageReader.getSurface());
             mPreviewBuilder.addTarget(previewSurface);
             Surface recorderSurface = mMediaRecorder.getSurface();
             surfaces.add(recorderSurface);
             // Set up Surface for the MediaRecorder
             mPreviewBuilder.addTarget(recorderSurface);
-
             mCameraDevice.createCaptureSession(surfaces, new CameraCaptureSession.StateCallback() {
                 @Override
                 public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
@@ -215,20 +238,26 @@ public class Camera2Record {
     }
 
     private void stratPreview() {
-        if (mTextureView == null) {
+        if (mTextureView == null && type == TYPE_TEXTURE || mSurfaceHolder == null && type == TYPE_SURFACEVIEW) {
             return;
         }
         try {
-            SurfaceTexture texture = mTextureView.getSurfaceTexture();
-            if (texture == null) {
-                return;
-            }
-            texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+
             mPreviewBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+            Surface previewSurface = null;
 
-            Surface previewSurface = new Surface(texture);
+            if (type == TYPE_TEXTURE) {
+                SurfaceTexture texture = mTextureView.getSurfaceTexture();
+                if (texture == null) {
+                    return;
+                }
+                texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+                previewSurface = new Surface(texture);
+            }else {
+                previewSurface = mSurfaceHolder.getSurface();
+            }
+
             mPreviewBuilder.addTarget(previewSurface);
-
             mCameraDevice.createCaptureSession(Collections.singletonList(previewSurface), new CameraCaptureSession.StateCallback() {
                 @Override
                 public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
@@ -248,6 +277,7 @@ public class Camera2Record {
 
 
     }
+
 
     public void closeCamera() {
         closePreviewSession();
