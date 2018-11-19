@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 
+import com.example.audioandvideo.opengles.TriangleActivity;
 import com.example.libaudio.util.Constant;
 import com.tbruyelle.rxpermissions2.Permission;
 import com.tbruyelle.rxpermissions2.RxPermissions;
@@ -92,6 +93,13 @@ public class EntranceActivity extends BaseActivity{
         toAct(VideoActivity.class);
     }
 
+    public void muxer(View view){
+        toAct(MuxerActivity.class);
+    }
+
+    public void triangle(View view){
+        toAct(TriangleActivity.class);
+    }
 
     private void toAct(Class clazz){
         Intent intent = new Intent(EntranceActivity.this, clazz);

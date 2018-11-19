@@ -23,6 +23,13 @@ public class Constant {
     public static String ADUIO_WAV_FILE_NAME = "/test.wav";
     // 视频文件
     public static String VIDEO_FILE_NAME = "/demo.mp4";
+    // 分离出来的视频文件
+    public static String OUTPUT_VIDEO = "/outputvideo.mp4";
+    // 分离出来的音频文件
+    public static String OUTPUT_AUDIO = "/outputaudio.mp3";
+    // 合成的视频文件
+    public static String COMBIN_FILE = "/combinvideo.mp4";
+
     // 音频输入源
     public static final int AUDIO_SOURCE = MediaRecorder.AudioSource.MIC;
     // 音频采样率 44100适合大部分手机

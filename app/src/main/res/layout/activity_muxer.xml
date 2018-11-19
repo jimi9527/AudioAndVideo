@@ -4,23 +4,18 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
     <Button
-        android:onClick="audio"
-        android:text="audio"
+        android:onClick="muxer_audio"
+        android:text="muxeraudio"
         android:layout_width="match_parent"
         android:layout_height="50dp"/>
     <Button
-        android:onClick="video"
-        android:text="video"
+        android:onClick="muxer_video"
+        android:text="muxervideo"
         android:layout_width="match_parent"
         android:layout_height="50dp"/>
     <Button
-        android:onClick="muxer"
-        android:text="muxer"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"/>
-    <Button
-        android:onClick="triangle"
-        android:text="triangle"
+        android:onClick="muxer_video_audio"
+        android:text="muxervideoandaudio"
         android:layout_width="match_parent"
         android:layout_height="50dp"/>
 </LinearLayout>
