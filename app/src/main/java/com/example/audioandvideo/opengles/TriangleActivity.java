@@ -25,7 +25,7 @@ public class TriangleActivity extends AppCompatActivity{
 
         if(checkOpenGL2()){
             mGLSurfaceView.setEGLContextClientVersion(2);
-            mGLSurfaceView.setRenderer(new TriangleRenderer());
+            mGLSurfaceView.setRenderer(new TriangleRenderer(this));
             rendererset = true;
         }
     }
