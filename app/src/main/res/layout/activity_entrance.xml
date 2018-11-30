@@ -23,4 +23,9 @@
         android:text="triangle"
         android:layout_width="match_parent"
         android:layout_height="50dp"/>
+    <Button
+        android:onClick="demo"
+        android:text="demo"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"/>
 </LinearLayout>

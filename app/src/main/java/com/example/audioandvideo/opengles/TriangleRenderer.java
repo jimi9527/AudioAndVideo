@@ -42,8 +42,12 @@ public class TriangleRenderer implements GLSurfaceView.Renderer {
     private float[] triangleWithVertexData = {
             0f, 0f,
             9f, 14f,
-            0f, 14f
+            0f, 14f,
+            0f, 0f,
+            9f, 0f,
+            9f, 14f,
     };
+
     private Context context;
     private final String vertexShaderCode =
             "attribute vec4 a_Position;" +
@@ -88,6 +92,9 @@ public class TriangleRenderer implements GLSurfaceView.Renderer {
             // 获取属性的位置
             aPositionLocation = glGetAttribLocation(programId, A_POSITION);
 
+            Log.d(TAG, "uColorLocation:" + uColorLocation);
+            Log.d(TAG, "aPositionLocation:" + aPositionLocation);
+
             vertexData.position(0);
             // 在缓冲区的vertexData找到aPositionLocation 对应的数据
             glVertexAttribPointer(aPositionLocation, POSITION_COMPONENT_COUNT, GL_FLOAT, false, 0, vertexData);
@@ -106,7 +113,7 @@ public class TriangleRenderer implements GLSurfaceView.Renderer {
 
         // 更新着色器代码中u_color的值
         glUniform4f(uColorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
-        // 绘制
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        // 绘制两个三角形
+        glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 }
